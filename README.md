@@ -2,11 +2,19 @@
 AWS Streaming + Lakehousing project
 
 ## Outline
-* Generate streaming data with Kinesis Data Generator
-* Ingest with Kinesis Data Streams
-* Transform with Glue and/or Lambda
-* Ingest into S3 (Firehose?)
-* Establish Glue Data Catalog
-* Queries with Athena
-* CloudWatch monitoring
-* All using Terraform
+ETL streaming -> lakehouse project, with Terraform for IaC and CloudWatch for monitoring.
+
+### Extract
+* Poll data from National Rail API using a Lambda function (boto3 + requests)
+* CloudWatch Event rule to trigger Lambda every minute
+
+### Transform
+* Lambda on-the-fly transformation - strip out some relevant info
+
+### Load
+* Firehose to S3
+* Glue Data Catalog
+
+### Serve
+* Athena for queries
+* QuickSight dashboard, e.g. current avg delay
