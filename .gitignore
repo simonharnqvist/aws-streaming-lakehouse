@@ -1,0 +1,48 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.env
+.mypy_cache/*
+
+# -------------------------
+# Lambda build artefacts
+# -------------------------
+fetcher/*.zip
+consumer/*.zip
+layer/layer.zip
+layer/python/*
+*.zip
+
+# -------------------------
+# Terraform
+# -------------------------
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+terraform.tfvars
+terraform.tfvars.json
+
+# -------------------------
+# Jupyter
+# -------------------------
+*.ipynb
+.ipynb_checkpoints/
+
+# -------------------------
+# OS / Editor junk
+# -------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

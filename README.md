@@ -1,19 +1,27 @@
 # aws-streaming-lakehouse
 AWS Streaming + Lakehousing project
 
-## Outline
+## Architecture
 ETL streaming -> lakehouse project, with Terraform for IaC and CloudWatch for monitoring.
 
-### Extract
-* Poll data from National Rail API using a Lambda function (boto3 + requests) with Kinesis Data Streams
+Extract & load: λ Lambda producer polling API -> Kinesis Data Stream ≋ -> λ Lambda consumer -> S3 bucket 🪣
+Transformation: Glue? LakeFormation?
+Serve: Athena + QuickSight
 
-### Transform
-* Lambda on-the-fly transformation - strip out some relevant info
+## How to use
 
-### Load
-* Send to S3
-* Glue Data Catalog
+Set LDBWS token (obtain from website) in .env:
+```shell
+LDBWS_TOKEN="abc123"
+```
 
-### Serve
-* Athena for queries
-* QuickSight dashboard, e.g. current avg delay
+Build layers and lambda functions:
+```shell
+./build.sh
+```
+The build is automatically validated and should throw human-readable errors if artifacts are missing.
+
+Deploy with Terraform:
+```shell
+./deploy.sh
+```

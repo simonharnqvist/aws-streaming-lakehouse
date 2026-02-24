@@ -37,10 +37,14 @@ def get_departure_board(crs="EDB", num_rows=100):
 
 
 def lambda_handler(event, context):
-    records = get_departure_board()
+    services = get_departure_board()
 
-    entries = [{"Data": json.dumps(r), "PartitionKey": r["serviceID"]} for r in records]
+    entries = []
+    for s in services:
+        payload = json.dumps(s).encode("utf-8")
+        pk = s.get("serviceID") or s.get("serviceId") or "unknown"
+        entries.append({"Data": payload, "PartitionKey": pk})
 
-    response = kinesis.put_recrods(Records=entries, StreamName="train-delays-stream")
+    response = kinesis.put_records(Records=entries, StreamName="train-delays-stream")
 
     return {"sent": len(entries), "failed": response["FailedRecordCount"]}
