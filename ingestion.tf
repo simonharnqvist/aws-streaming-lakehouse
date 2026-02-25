@@ -1,6 +1,6 @@
 resource "aws_lambda_layer_version" "python_deps" {
-    filename = "layer/layer.zip"
-    layer_name = "python_dependencies"
+    filename = "layer_deps/layer_deps.zip"
+    layer_name = "layer_deps"
     compatible_runtimes = ["python3.12"]
 }
 
@@ -20,8 +20,8 @@ resource "aws_lambda_function" "fetcher" {
 
     environment {
       variables = {
-        ldbws_token = var.ldbws_token
-        station_crs = var.station_crs
+        LDBWS_TOKEN = var.ldbws_token
+        STATION_CRS = var.station_crs
         STREAM_NAME = aws_kinesis_stream.departures_stream.name
           }
               }

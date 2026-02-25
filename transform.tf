@@ -1,3 +1,9 @@
+resource "aws_lambda_layer_version" "pyarrow" {
+    filename = "layer_pyarrow/layer_pyarrow.zip"
+    layer_name = "layer_pyarrow"
+    compatible_runtimes = ["python3.12"]
+}
+
 resource "aws_lambda_function" "transformer" {
     filename = "transformer/transformer.zip"
     function_name = "transformer_lambda_function"
@@ -5,7 +11,7 @@ resource "aws_lambda_function" "transformer" {
     runtime = "python3.12"
     role = aws_iam_role.transformer.arn
     architectures = ["x86_64"]
-    layers = [aws_lambda_layer_version.python_deps.arn]
+    layers = [aws_lambda_layer_version.pyarrow.arn]
 
     source_code_hash = filebase64sha256("transformer/transformer.zip")
 

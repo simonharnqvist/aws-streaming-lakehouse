@@ -7,12 +7,12 @@ import json
 from datetime import datetime, timezone
 
 WSDL = "https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2021-11-01"
-CRS = os.getenv("STATION_CODE")
+CRS = os.getenv("STATION_CRS")
+LDBWS_TOKEN = os.getenv("LDBWS_TOKEN")
 kinesis = boto3.client("kinesis")
 
 
 def get_departure_board(crs=CRS, num_rows=100):
-    LDBWS_TOKEN = os.getenv("ldbws_token")
 
     settings = Settings(strict=False)
     history = HistoryPlugin()
@@ -35,16 +35,15 @@ def get_departure_board(crs=CRS, num_rows=100):
         numRows=num_rows, crs=crs, _soapheaders=[header_value]
     )
 
-    return serialize_object(res.trainServices.service)
+    return serialize_object(res)
 
 
 def lambda_handler(event, context):
-    station = os.getenv("STATION_CRS", "EDI")
-    raw = get_departure_board()
+    raw = get_departure_board(crs=CRS)
 
     enriched = {
         "metadata": {
-            "station": station,
+            "station": CRS,
             "fetched_at": datetime.now(timezone.utc).isoformat(),
         },
         "payload": raw,
@@ -55,7 +54,7 @@ def lambda_handler(event, context):
     entries = []
     for s in services:
         record = {"metadata": enriched["metadata"], "service": s}
-        payload = json.dumps(s).encode("utf-8")
+        payload = json.dumps(record).encode("utf-8")
         pk = s.get("serviceID") or s.get("serviceId") or "unknown"
         entries.append({"Data": payload, "PartitionKey": pk})
 

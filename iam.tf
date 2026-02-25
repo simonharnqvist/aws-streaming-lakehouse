@@ -125,8 +125,9 @@ resource "aws_iam_role_policy" "transformer_policy" {
     Statement = [
       {
         Effect = "Allow"
-        Action = ["s3:GetObject"]
-        Resource = "${aws_s3_bucket.raw.arn}/*"
+        Action = ["s3:GetObject", "s3:ListBucket"]
+        Resource = ["${aws_s3_bucket.raw.arn}",
+                    "${aws_s3_bucket.raw.arn}/*"]
       },
       {
         Effect = "Allow"
@@ -146,4 +147,3 @@ resource "aws_iam_role_policy" "transformer_policy" {
     ]
   })
 }
-

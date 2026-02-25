@@ -55,7 +55,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "clean_sse" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "clean_block" {
+resource "aws_s3_bucket_public_access_block" "_block" {
   bucket = aws_s3_bucket.clean.id
 
   block_public_acls       = true

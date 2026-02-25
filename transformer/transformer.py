@@ -62,12 +62,17 @@ def _is_hhmm(value: str) -> bool:
         return False
 
 
-def handler(event, context):
+def lambda_handler(event, context):
     record = event["Records"][0]
     bucket = record["s3"]["bucket"]["name"]
     key = record["s3"]["object"]["key"]
 
-    raw_bytes = s3.get_object(Bucket=bucket, Key=key)["Body"].read()
+    resp = s3.get_object(Bucket=bucket, Key=key)
+    if "Body" not in resp:
+        raise RuntimeError(
+            f"S3 object missing Body: bucket={bucket}, key={key}, resp={resp}"
+        )
+    raw_bytes = resp["Body"].read()
     raw_lines = raw_bytes.decode("utf-8").splitlines()
 
     records = [json.loads(line) for line in raw_lines]
