@@ -21,6 +21,7 @@ resource "aws_lambda_function" "fetcher" {
     environment {
       variables = {
         ldbws_token = var.ldbws_token
+        station_crs = var.station_crs
         STREAM_NAME = aws_kinesis_stream.departures_stream.name
           }
               }
