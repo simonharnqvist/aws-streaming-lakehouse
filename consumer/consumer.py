@@ -19,7 +19,7 @@ def lambda_handler(event, context):
         return {"written": 0}
 
     now = datetime.now(tz=timezone.utc)
-    prefix = f"year={now.year}/month={now.month:02d}/day={now.day:02d}"
+    prefix = f"raw/year={now.year}/month={now.month:02d}/day={now.day:02d}"
 
     body = "\n".join(json.dumps(x) for x in processed).encode("utf-8")
 

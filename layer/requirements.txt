@@ -5,3 +5,4 @@ requests-toolbelt
 isodate
 defusedxml
 pytz
+pyarrow
