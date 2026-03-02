@@ -1,7 +1,0 @@
-zeep
-lxml
-requests
-requests-toolbelt
-isodate
-defusedxml
-pytz

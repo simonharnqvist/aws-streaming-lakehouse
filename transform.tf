@@ -45,8 +45,3 @@ resource "aws_lambda_permission" "allow_s3_raw" {
     principal = "s3.amazonaws.com"
     source_arn = aws_s3_bucket.raw.arn
 }
-
-resource "aws_cloudwatch_log_group" "transformer" {
-    name              = "/aws/lambda/${aws_lambda_function.transformer.function_name}"
-    retention_in_days = 1
-}
