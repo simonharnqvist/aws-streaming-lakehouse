@@ -32,7 +32,8 @@ resource "aws_s3_bucket_notification" "raw_events" {
     lambda_function {
       lambda_function_arn = aws_lambda_function.transformer.arn
       events = ["s3:ObjectCreated:*"]
-      filter_prefix = "raw/"
+      filter_prefix = "raw"
+      filter_suffix = ".json.gz"
     }
 
     depends_on = [ aws_lambda_permission.allow_s3_raw ]

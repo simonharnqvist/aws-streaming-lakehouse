@@ -2,7 +2,6 @@
 
 ifneq (,$(wildcard .env))
 include .env
-export
 endif
 
 export TF_VAR_ldbws_token  = $(LDBWS_TOKEN)

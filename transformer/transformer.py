@@ -3,8 +3,10 @@ import json
 from datetime import datetime
 import pyarrow as pa
 import pyarrow.parquet as pq
+from urllib.parse import unquote_plus
 import io
 import os
+import gzip
 
 s3 = boto3.client("s3")
 CLEAN_BUCKET = os.getenv("CLEAN_BUCKET")
@@ -65,17 +67,24 @@ def _is_hhmm(value: str) -> bool:
 def lambda_handler(event, context):
     record = event["Records"][0]
     bucket = record["s3"]["bucket"]["name"]
-    key = record["s3"]["object"]["key"]
 
-    resp = s3.get_object(Bucket=bucket, Key=key)
+    raw_key = event["Records"][0]["s3"]["object"]["key"]
+    key = unquote_plus(raw_key)
+
+    try:
+        resp = s3.get_object(Bucket=bucket, Key=key)
+    except Exception as e:
+        print(f"{e}. bucket: {bucket}, key: {key}")
+        raise
+
     if "Body" not in resp:
         raise RuntimeError(
             f"S3 object missing Body: bucket={bucket}, key={key}, resp={resp}"
         )
     raw_bytes = resp["Body"].read()
-    raw_lines = raw_bytes.decode("utf-8").splitlines()
+    lines = gzip.decompress(raw_bytes).decode("utf-8").splitlines()
 
-    records = [json.loads(line) for line in raw_lines]
+    records = [json.loads(line) for line in lines]
 
     if not records:
         print("No records found in raw file")
@@ -94,7 +103,7 @@ def lambda_handler(event, context):
         print("No clean rows produced")
         return {"status": "no_clean"}
 
-    table = pa.from_pylist(clean_rows)
+    table = pa.Table.from_pylist(clean_rows)
     buf = io.BytesIO()
     pq.write_table(table, buf)
     parquet_bytes = buf.getvalue()

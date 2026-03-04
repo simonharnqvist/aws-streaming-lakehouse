@@ -19,13 +19,14 @@ def lambda_handler(event, context):
         return {"written": 0}
 
     now = datetime.now(tz=timezone.utc)
+    ts = int(now.timestamp()) * 1000
     prefix = f"raw/year={now.year}/month={now.month:02d}/day={now.day:02d}"
 
     body = "\n".join(json.dumps(x) for x in processed).encode("utf-8")
 
     s3.put_object(
         Bucket=BUCKET,
-        Key=f"{prefix}/batch-{now.timestamp()}.json.gz",
+        Key=f"{prefix}/batch-{ts}.json.gz",
         Body=gzip.compress(body),
         ContentType="application/json",
         ContentEncoding="gzip",

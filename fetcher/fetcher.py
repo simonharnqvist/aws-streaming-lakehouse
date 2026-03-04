@@ -31,9 +31,13 @@ def get_departure_board(crs=CRS, num_rows=100):
     )
     header_value = header(TokenValue=LDBWS_TOKEN)
 
-    res = client.service.GetDepartureBoard(
-        numRows=num_rows, crs=crs, _soapheaders=[header_value]
-    )
+    try:
+        res = client.service.GetDepartureBoard(
+            numRows=num_rows, crs=crs, _soapheaders=[header_value]
+        )
+    except Exception as e:
+        print(f"SOAP error: {e}. CRS: {crs}. Headers: {header_value}")
+        raise
 
     return serialize_object(res)
 
