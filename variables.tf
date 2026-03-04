@@ -9,3 +9,8 @@ variable "station_crs" {
 variable "clean_bucket" {
     type = string
 }
+
+variable "scripts_bucket" {
+    type = string
+  
+}
