@@ -1,10 +1,10 @@
 .PHONY: build deploy destroy
 
 build:
-	$(MAKE) -f build.mk build
+	$(MAKE) -f infra/build.mk build
 
 deploy:
-	$(MAKE) -f deploy.mk deploy
+	$(MAKE) -f infra/deploy.mk deploy
 
 destroy: 
-	$(MAKE) -f destroy.mk destroy
+	$(MAKE) -f infra/destroy.mk destroy

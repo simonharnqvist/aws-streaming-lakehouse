@@ -1,0 +1,5 @@
+boto3
+zeep
+lxml
+requests
+urllib3

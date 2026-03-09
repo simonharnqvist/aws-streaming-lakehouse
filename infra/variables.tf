@@ -10,7 +10,7 @@ variable "clean_bucket" {
     type = string
 }
 
-variable "scripts_bucket" {
+variable "glue_scripts_bucket" {
     type = string
   
 }
