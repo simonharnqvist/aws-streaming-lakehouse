@@ -1,12 +1,15 @@
-# aws-streaming-lakehouse
-AWS Streaming + Lakehousing project
+# train-delays-streaming-aws
+AWS personal project to practise streaming/microbatching and Terraform.
 
-## Architecture
-ETL streaming -> lakehouse project, with Terraform for IaC and CloudWatch for monitoring.
+This pipeline polls the live departure board at Waverley Station (Edinburgh) and ultimately gets the current average delay for dashboard use. 
 
-Extract & load: λ Lambda producer polling API -> Kinesis Data Stream ≋ -> λ Lambda consumer -> S3 bucket 🪣
-Transformation: Glue? LakeFormation?
-Serve: Athena + QuickSight
+Stack:
+* AWS Lambda - fetcher, consumer, and transformation functions
+* Kinesis Data Streams - for streaming data from polling function to consumer
+* S3 - data storage/lakehouse
+* Glue - hourly compaction of parquets to avoid small files problem
+* Athena - data lakehouse (in progress)
+* QuickSight dashboard?
 
 ## How to use
 
@@ -17,11 +20,16 @@ LDBWS_TOKEN="abc123"
 
 Build layers and lambda functions:
 ```shell
-./build.sh
+make build
 ```
 The build is automatically validated and should throw human-readable errors if artifacts are missing.
 
 Deploy with Terraform:
 ```shell
-./deploy.sh
+make deploy
+```
+
+Once done, destroy all resources with:
+```shell
+make destroy
 ```
