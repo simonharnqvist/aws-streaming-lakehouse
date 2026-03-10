@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_role" "fetcher" {
   name = "fetcher_lambda_role"
 
@@ -197,6 +199,76 @@ resource "aws_iam_role_policy" "glue_compaction_policy" {
           "s3:ListAllMyBuckets"
         ]
         Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "glue_crawler_role" {
+  name = "glue_crawler_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "glue.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "glue_crawler_policy" {
+  name = "glue_crawler_policy"
+  role = aws_iam_role.glue_crawler_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      # S3 access
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.clean.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.clean.bucket}/*"
+        ]
+      },
+
+      # Glue catalog access
+      {
+        Effect = "Allow"
+        Action = [
+          "glue:CreateTable",
+          "glue:UpdateTable",
+          "glue:GetTable",
+          "glue:GetTables",
+          "glue:BatchCreatePartition",
+          "glue:BatchUpdatePartition",
+            "glue:GetDatabase",
+            "glue:GetDatabases"
+        ]
+        Resource = "*"
+      },
+
+      # CloudWatch Logs access
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/crawlers",
+          "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws-glue/crawlers:*"
+        ]
       }
     ]
   })

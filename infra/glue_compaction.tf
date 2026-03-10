@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "scripts_bucket" {
   force_destroy = true
 
   tags = {
-    Name = "glue-scripts"
+    Name = "train-delays-glue-scripts-simon"
   }
 }
 

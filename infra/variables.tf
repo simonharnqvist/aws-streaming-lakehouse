@@ -14,3 +14,7 @@ variable "glue_scripts_bucket" {
     type = string
   
 }
+
+variable "region" {
+    type = string
+}
