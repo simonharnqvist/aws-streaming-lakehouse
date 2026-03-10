@@ -57,7 +57,7 @@ python_layer:
 # Lambda functions
 # ============================
 
-functions: fetcher consumer transformer
+functions: fetcher consumer transformer update_partitions
 
 fetcher: $(LAMBDAS_DIR)/fetcher/fetcher.py
 	@echo "=== Building fetcher ==="
@@ -74,7 +74,10 @@ transformer: $(LAMBDAS_DIR)/transformer/transformer.py
 	rm -f $(LAMBDAS_DIR)/transformer/transformer.zip
 	zip -j $(LAMBDAS_DIR)/transformer/transformer.zip $<
 
-
+update_partitions: $(LAMBDAS_DIR)/update_partitions/update_partitions.py
+	@echo "=== Building update_partitions ==="
+	rm -f $(LAMBDAS_DIR)/update_partitions/update_partitions.zip
+	zip -j $(LAMBDAS_DIR)/update_partitions/update_partitions.zip $<
 
 # ==========================
 # Validation
@@ -131,3 +134,7 @@ validate_functions:
 	@if ! unzip -l $(LAMBDAS_DIR)/transformer/transformer.zip | grep -q "transformer.py"; then \
 		echo "❌ ERROR: transformer.zip missing transformer.py"; exit 1; \
 	else echo "✅ transformer.zip contains transformer.py"; fi
+
+	@if ! unzip -l $(LAMBDAS_DIR)/update_partitions/update_partitions.zip | grep -q "update_partitions.py"; then \
+		echo "❌ ERROR: update_partitions.zip missing update_partitions.py"; exit 1; \
+	else echo "✅ update_partitions.zip contains update_partitions.py"; fi

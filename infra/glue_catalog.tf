@@ -68,3 +68,39 @@ resource "aws_glue_catalog_table" "train_delays" {
     type = "string"
   }
 }
+
+resource "aws_lambda_function" "update_partitions" {
+  filename         = "${path.module}/../src/lambdas/update_partitions/update_partitions.zip"
+  function_name    = "update_partitions"
+  role             = aws_iam_role.update_partitions_role.arn
+  handler          = "update_partitions.lambda_handler"
+  runtime          = "python3.12"
+
+  environment {
+    variables = {
+      GLUE_DATABASE = aws_glue_catalog_database.glue_catalog.name
+      GLUE_TABLE    = aws_glue_catalog_table.train_delays.name
+    }
+  }
+}
+
+resource "aws_lambda_permission" "allow_clean_bucket" {
+  statement_id  = "AllowExecutionFromCleanBucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.update_partitions.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.clean.arn
+}
+
+resource "aws_s3_bucket_notification" "clean_bucket_notification" {
+  bucket = aws_s3_bucket.clean.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.update_partitions.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "clean/"
+    filter_suffix       = ".parquet"
+  }
+
+  depends_on = [aws_lambda_permission.allow_clean_bucket]
+}

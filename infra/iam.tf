@@ -273,3 +273,61 @@ resource "aws_iam_role_policy" "glue_crawler_policy" {
     ]
   })
 }
+
+data "aws_iam_policy_document" "lambda_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "update_partitions_role" {
+  name               = "update_partitions_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+# Glue + S3 + Logs permissions
+data "aws_iam_policy_document" "update_partitions_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetPartition",
+      "glue:BatchCreatePartition"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["arn:aws:logs:*:*:*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      aws_s3_bucket.clean.arn,
+      "${aws_s3_bucket.clean.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "update_partitions_policy" {
+  role   = aws_iam_role.update_partitions_role.id
+  policy = data.aws_iam_policy_document.update_partitions_policy.json
+}

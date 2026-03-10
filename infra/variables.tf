@@ -18,3 +18,11 @@ variable "glue_scripts_bucket" {
 variable "region" {
     type = string
 }
+
+variable "glue_database" {
+    type = string
+}
+
+variable "glue_table" {
+    type = string
+}
